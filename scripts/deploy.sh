@@ -136,7 +136,7 @@ EOF
         {
             "FileMapping"
             {
-                "LocalPath" "${depot_path}"
+                "LocalPath" "./${depot_path}/*"
                 "DepotPath" "."
                 "recursive" "1"
             }
