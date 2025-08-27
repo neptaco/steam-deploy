@@ -180,6 +180,27 @@ install_dependencies() {
     echo "::endgroup::"
 }
 
+test_steam_login() {
+    echo "::group::Testing Steam login"
+    
+    echo "Testing login with user: ${STEAM_USERNAME}"
+    
+    # ログインテスト（+quit で即座に終了）
+    "${STEAMCMD_BIN}" +login "${STEAM_USERNAME}" +quit 2>&1 | grep --line-buffered -v "enum_names.cpp (2184)" || true
+    
+    local exit_code=${PIPESTATUS[0]}
+    
+    if [ ${exit_code} -eq 0 ]; then
+        echo "::notice::Steam login successful!"
+    else
+        echo "::error::Steam login failed with exit code ${exit_code}"
+        echo "Please check your credentials and config.vdf"
+        exit ${exit_code}
+    fi
+    
+    echo "::endgroup::"
+}
+
 run_steamcmd_deployment() {
     local vdf_file="$1"
     
@@ -281,6 +302,8 @@ main() {
     download_steamcmd "${OS_TYPE}"
     
     setup_config_vdf
+    
+    test_steam_login
     
     VDF_FILE=$(prepare_vdf_file)
     
