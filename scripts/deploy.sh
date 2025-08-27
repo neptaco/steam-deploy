@@ -85,14 +85,26 @@ prepare_vdf_file() {
     if [ -z "${vdf_file}" ] || [ ! -f "${vdf_file}" ]; then
         vdf_file="${STEAMCMD_DIR}/app_build_${STEAM_APP_ID}.vdf"
         
+        # ROOT_PATH を絶対パスに変換
+        local content_root="${ROOT_PATH:-.}"
+        if [[ "${content_root}" != /* ]]; then
+            # 相対パスの場合、GITHUB_WORKSPACE または現在のディレクトリからの絶対パスに変換
+            if [ -n "${GITHUB_WORKSPACE}" ]; then
+                content_root="${GITHUB_WORKSPACE}/${content_root}"
+            else
+                content_root="$(cd "${content_root}" 2>/dev/null && pwd)" || content_root="$(pwd)/${content_root}"
+            fi
+        fi
+        
         echo "Creating VDF file at ${vdf_file}" >&2
+        echo "Content root: ${content_root}" >&2
         cat > "${vdf_file}" << EOF
 "appbuild"
 {
     "appid" "${STEAM_APP_ID}"
     "desc" "${BUILD_DESCRIPTION}"
     "buildoutput" "${STEAMCMD_DIR}/steam_content/logs"
-    "contentroot" "${ROOT_PATH}"
+    "contentroot" "${content_root}"
     "setlive" ""
     "preview" "0"
     "local" ""
@@ -116,12 +128,20 @@ EOF
                     echo "Auto-generating Depot ${i} ID: ${depot_id}" >&2
                 fi
                 
+                # depot_path を絶対パスに変換
+                local local_path="${depot_path}"
+                if [[ "${local_path}" != /* ]]; then
+                    # 相対パスの場合、content_root からの相対パスとして扱う
+                    local_path="${content_root}/${local_path}"
+                fi
+                echo "Depot ${i} path: ${local_path}" >&2
+                
                 cat >> "${vdf_file}" << EOF
         "${depot_id}"
         {
             "FileMapping"
             {
-                "LocalPath" "${depot_path}"
+                "LocalPath" "${local_path}"
                 "DepotPath" "."
                 "recursive" "1"
             }
