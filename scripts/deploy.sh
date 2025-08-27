@@ -152,6 +152,28 @@ EOF
     fi
     
     echo "VDF file prepared at ${vdf_file}" >&2
+    
+    # デバッグ: VDF ファイルの内容を表示
+    echo "::group::VDF File Contents (Debug)" >&2
+    cat "${vdf_file}" >&2
+    echo "::endgroup::" >&2
+    
+    # デバッグ: ディレクトリの存在確認
+    echo "::group::Directory Check (Debug)" >&2
+    echo "Content root exists: $([ -d "${content_root}" ] && echo 'Yes' || echo 'No')" >&2
+    if [ -d "${content_root}" ]; then
+        echo "Content root contents:" >&2
+        ls -la "${content_root}" >&2 || true
+        
+        # depot ディレクトリの確認
+        for dep_path in macos windows linux; do
+            if [ -d "${content_root}/${dep_path}" ]; then
+                echo "Depot ${dep_path} exists with $(find "${content_root}/${dep_path}" -type f | wc -l) files" >&2
+            fi
+        done
+    fi
+    echo "::endgroup::" >&2
+    
     echo "::endgroup::" >&2
     
     # 標準出力にはファイルパスのみを返す
@@ -195,6 +217,7 @@ quit
 EOF
 
     echo "Executing SteamCMD..."
+    # 注: enum_names.cpp の警告は SteamCMD の既知のバグで無害です
     "${STEAMCMD_BIN}" +runscript "${steamcmd_script}"
     
     local exit_code=$?
