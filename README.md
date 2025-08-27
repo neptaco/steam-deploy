@@ -54,6 +54,7 @@ jobs:
     depot1Path: 'windows'  # 自動で ID: 1234568
     depot2Path: 'mac'      # 自動で ID: 1234569
     depot3Path: 'linux'    # 自動で ID: 1234570
+    releaseBranch: 'prerelease'  # プレリリースブランチにデプロイ
 ```
 
 ### 複数 depot の例（ID明示指定）
@@ -101,6 +102,8 @@ jobs:
 | `buildDescription` | ❌ | ビルドの説明文 |
 | `rootPath` | ❌ | ビルドファイルのルートパス（デフォルト: `.`） |
 | `vdfPath` | ❌ | カスタム VDF ファイルへのパス |
+| `releaseBranch` | ❌ | デプロイ先のブランチ（例: prerelease, beta, default） |
+| `debugBranch` | ❌ | `true` に設定するとデバッグファイルを含める（デフォルト: `false`） |
 | `depot1Id` | ❌ | Depot 1 の ID（省略時は App ID + 1） |
 | `depot1Path` | ❌ | Depot 1 のパス |
 | `depot2Id` | ❌ | Depot 2 の ID（省略時は App ID + 2） |
@@ -144,6 +147,16 @@ Steam Guard を無効化するか、config.vdf ファイルを使用して認証
 
 - `STEAM_USERNAME`: Steam のユーザー名
 - `STEAM_CONFIG_VDF`: Base64 エンコードされた config.vdf
+
+## ファイル除外
+
+デフォルトでは、以下のファイルが自動的に除外されます：
+- `*.DS_Store` (常に除外)
+- `*.pdb` (debugBranch が false の場合)
+- `**/*_BurstDebugInformation_DoNotShip*` (debugBranch が false の場合)
+- `**/*_BackUpThisFolder_ButDontShipItWithYourGame*` (debugBranch が false の場合)
+
+デバッグビルドをデプロイする場合は、`debugBranch: 'true'` を設定してください。
 
 ## 動作環境
 

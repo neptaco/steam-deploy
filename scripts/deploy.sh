@@ -105,7 +105,7 @@ prepare_vdf_file() {
     "desc" "${BUILD_DESCRIPTION}"
     "buildoutput" "${STEAMCMD_DIR}/steam_content/logs"
     "contentroot" "${content_root}"
-    "setlive" ""
+    "setlive" "${RELEASE_BRANCH}"
     "preview" "0"
     "local" ""
     
@@ -131,7 +131,26 @@ EOF
                 # depot_path をそのまま使用（ContentRoot からの相対パスとして）
                 echo "Depot ${i} path: ${depot_path}" >&2
                 
-                cat >> "${vdf_file}" << EOF
+                # Debug ブランチでない場合はデバッグファイルを除外
+                if [ "${DEBUG_BRANCH}" != "true" ]; then
+                    cat >> "${vdf_file}" << EOF
+        "${depot_id}"
+        {
+            "FileMapping"
+            {
+                "LocalPath" "./${depot_path}/*"
+                "DepotPath" "."
+                "recursive" "1"
+            }
+            "FileExclusion" "*.DS_Store"
+            "FileExclusion" "*.pdb"
+            "FileExclusion" "**/*_BurstDebugInformation_DoNotShip*"
+            "FileExclusion" "**/*_BackUpThisFolder_ButDontShipItWithYourGame*"
+        }
+EOF
+                else
+                    # Debug ブランチの場合は .DS_Store のみ除外
+                    cat >> "${vdf_file}" << EOF
         "${depot_id}"
         {
             "FileMapping"
@@ -143,6 +162,7 @@ EOF
             "FileExclusion" "*.DS_Store"
         }
 EOF
+                fi
             elif [ -n "${depot_id}" ]; then
                 echo "::warning::Depot ${i}: ID specified but Path is missing (ID: ${depot_id})" >&2
             fi

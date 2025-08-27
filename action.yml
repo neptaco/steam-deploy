@@ -96,6 +96,14 @@ inputs:
     description: 'The path for depot 9'
     required: false
     default: ''
+  releaseBranch:
+    description: 'The branch to release to (e.g., prerelease, beta, default)'
+    required: false
+    default: ''
+  debugBranch:
+    description: 'Set to true to include debug files (*.pdb, BurstDebugInformation, etc.)'
+    required: false
+    default: 'false'
 
 runs:
   using: 'composite'
@@ -129,6 +137,8 @@ runs:
         DEPOT8_PATH: ${{ inputs.depot8Path }}
         DEPOT9_ID: ${{ inputs.depot9Id }}
         DEPOT9_PATH: ${{ inputs.depot9Path }}
+        RELEASE_BRANCH: ${{ inputs.releaseBranch }}
+        DEBUG_BRANCH: ${{ inputs.debugBranch }}
 
 branding:
   icon: 'upload-cloud'
