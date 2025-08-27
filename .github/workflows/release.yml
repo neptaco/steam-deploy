@@ -1,0 +1,24 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  update-major-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Update major version tag
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          MAJOR_VERSION=$(echo $VERSION | cut -d. -f1)
+          
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          
+          # Delete and recreate major version tag
+          git tag -fa $MAJOR_VERSION -m "Update $MAJOR_VERSION tag to $VERSION"
+          git push origin $MAJOR_VERSION --force

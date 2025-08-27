@@ -78,14 +78,14 @@ setup_config_vdf() {
 }
 
 prepare_vdf_file() {
-    echo "::group::Preparing VDF file"
+    echo "::group::Preparing VDF file" >&2
     
     local vdf_file="${VDF_PATH}"
     
     if [ -z "${vdf_file}" ] || [ ! -f "${vdf_file}" ]; then
         vdf_file="${STEAMCMD_DIR}/app_build_${STEAM_APP_ID}.vdf"
         
-        echo "Creating VDF file at ${vdf_file}"
+        echo "Creating VDF file at ${vdf_file}" >&2
         cat > "${vdf_file}" << EOF
 "appbuild"
 {
@@ -113,7 +113,7 @@ EOF
                 # ID が指定されていない場合は自動生成（App ID + 番号）
                 if [ -z "${depot_id}" ]; then
                     depot_id=$((STEAM_APP_ID + i))
-                    echo "Auto-generating Depot ${i} ID: ${depot_id}"
+                    echo "Auto-generating Depot ${i} ID: ${depot_id}" >&2
                 fi
                 
                 cat >> "${vdf_file}" << EOF
@@ -136,9 +136,10 @@ EOF
         echo '}' >> "${vdf_file}"
     fi
     
-    echo "VDF file prepared at ${vdf_file}"
-    echo "::endgroup::"
+    echo "VDF file prepared at ${vdf_file}" >&2
+    echo "::endgroup::" >&2
     
+    # 標準出力にはファイルパスのみを返す
     echo "${vdf_file}"
 }
 
