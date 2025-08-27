@@ -129,15 +129,27 @@ EOF
                     echo "Auto-generating Depot ${i} ID: ${depot_id}" >&2
                 fi
                 
-                # depot_path はそのまま使用（ContentRoot からの相対パスとして）
-                echo "Depot ${i} path: ${depot_path}" >&2
+                # macOS .app バンドルの特別な処理
+                local local_path="${depot_path}"
+                if [ -d "${content_root}/${depot_path}" ]; then
+                    # .app ディレクトリが1つだけある場合、そのディレクトリを直接指定
+                    local app_count=$(find "${content_root}/${depot_path}" -maxdepth 1 -name "*.app" -type d | wc -l | tr -d ' ')
+                    if [ "${app_count}" = "1" ]; then
+                        local app_name=$(find "${content_root}/${depot_path}" -maxdepth 1 -name "*.app" -type d -exec basename {} \;)
+                        echo "Found single .app bundle: ${app_name}" >&2
+                        local_path="${depot_path}/${app_name}"
+                        echo "Using .app bundle path: ${local_path}" >&2
+                    fi
+                fi
+                
+                echo "Depot ${i} path: ${local_path}" >&2
                 
                 cat >> "${vdf_file}" << EOF
         "${depot_id}"
         {
             "FileMapping"
             {
-                "LocalPath" "${depot_path}"
+                "LocalPath" "${local_path}"
                 "DepotPath" "."
                 "recursive" "1"
             }
