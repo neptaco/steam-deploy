@@ -128,20 +128,15 @@ EOF
                     echo "Auto-generating Depot ${i} ID: ${depot_id}" >&2
                 fi
                 
-                # depot_path を絶対パスに変換
-                local local_path="${depot_path}"
-                if [[ "${local_path}" != /* ]]; then
-                    # 相対パスの場合、content_root からの相対パスとして扱う
-                    local_path="${content_root}/${local_path}"
-                fi
-                echo "Depot ${i} path: ${local_path}" >&2
+                # depot_path はそのまま使用（ContentRoot からの相対パスとして）
+                echo "Depot ${i} path: ${depot_path}" >&2
                 
                 cat >> "${vdf_file}" << EOF
         "${depot_id}"
         {
             "FileMapping"
             {
-                "LocalPath" "${local_path}"
+                "LocalPath" "${depot_path}"
                 "DepotPath" "."
                 "recursive" "1"
             }
