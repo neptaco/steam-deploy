@@ -197,7 +197,7 @@ EOF
 
     echo "Executing SteamCMD..."
     # 注: enum_names.cpp の警告は SteamCMD の既知のバグで無害です
-    "${STEAMCMD_BIN}" +runscript "${steamcmd_script}" 2>&1 | grep -v "enum_names.cpp (2184)" || true
+    "${STEAMCMD_BIN}" +runscript "${steamcmd_script}" 2>&1 | grep --line-buffered -v "enum_names.cpp (2184)" || true
     
     local exit_code=${PIPESTATUS[0]}
     
