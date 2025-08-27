@@ -128,7 +128,7 @@ EOF
         }
 EOF
             elif [ -n "${depot_id}" ]; then
-                echo "::warning::Depot ${i}: ID specified but Path is missing (ID: ${depot_id})"
+                echo "::warning::Depot ${i}: ID specified but Path is missing (ID: ${depot_id})" >&2
             fi
         done
         
