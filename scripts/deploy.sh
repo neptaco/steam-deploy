@@ -108,7 +108,6 @@ prepare_vdf_file() {
     "setlive" ""
     "preview" "0"
     "local" ""
-    "log" "1"
     
     "depots"
     {
@@ -141,6 +140,7 @@ EOF
                 "DepotPath" "."
                 "recursive" "1"
             }
+            "FileExclusion" "*.DS_Store"
         }
 EOF
             elif [ -n "${depot_id}" ]; then
