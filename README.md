@@ -179,18 +179,6 @@ config.vdf が正しく Base64 エンコードされていることを確認：
 echo $STEAM_CONFIG_VDF | base64 -d
 ```
 
-### macOS .app バンドルの問題
-
-macOS の `.app` バンドルを含む depot が空として認識される場合：
-
-1. depot ディレクトリに通常のファイルを追加（例: README.txt）
-2. SteamCMD は `.app` ディレクトリを特殊扱いするため、通常のファイルがないと空と判断される
-
-```yaml
-- name: Add placeholder for macOS depot
-  run: |
-    echo "Game files" > builds/macos/README.txt
-```
 
 ## ライセンス
 
