@@ -3,7 +3,7 @@ set -e
 
 echo "::group::Steam Deploy - Starting deployment"
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+# SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" # Unused, kept for future reference
 
 # SteamCMD のインストール先を決定
 # 優先順位: RUNNER_TEMP > TMPDIR > /tmp > checkout directory
@@ -210,12 +210,12 @@ test_steam_login() {
     
     local exit_code=${PIPESTATUS[0]}
     
-    if [ ${exit_code} -eq 0 ]; then
+    if [ "${exit_code}" -eq 0 ]; then
         echo "::notice::Steam login successful!"
     else
         echo "::error::Steam login failed with exit code ${exit_code}"
         echo "Please check your credentials and config.vdf"
-        exit ${exit_code}
+        exit "${exit_code}"
     fi
     
     echo "::endgroup::"
@@ -242,7 +242,7 @@ EOF
     
     local exit_code=${PIPESTATUS[0]}
     
-    if [ ${exit_code} -ne 0 ]; then
+    if [ "${exit_code}" -ne 0 ]; then
         echo "::error::SteamCMD deployment failed with exit code ${exit_code}"
         
         # ログファイルの場所を確認
@@ -253,7 +253,7 @@ EOF
             echo "::endgroup::"
         fi
         
-        exit ${exit_code}
+        exit "${exit_code}"
     fi
     
     echo "::endgroup::"
