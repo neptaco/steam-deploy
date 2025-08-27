@@ -37,7 +37,7 @@ jobs:
           configVdf: ${{ secrets.STEAM_CONFIG_VDF }}
           appId: '1234567'
           buildDescription: 'Automated build from GitHub Actions'
-          rootPath: './build'
+          rootPath: 'build'
 ```
 
 ### 複数 depot の例（ID自動生成）
@@ -51,9 +51,9 @@ jobs:
     appId: '1234567'
     buildDescription: 'Multi-depot build'
     rootPath: '.'
-    depot1Path: './windows'  # 自動で ID: 1234568
-    depot2Path: './mac'      # 自動で ID: 1234569
-    depot3Path: './linux'    # 自動で ID: 1234570
+    depot1Path: 'windows'  # 自動で ID: 1234568
+    depot2Path: 'mac'      # 自動で ID: 1234569
+    depot3Path: 'linux'    # 自動で ID: 1234570
 ```
 
 ### 複数 depot の例（ID明示指定）
@@ -68,11 +68,11 @@ jobs:
     buildDescription: 'Multi-depot build'
     rootPath: '.'
     depot1Id: '1234568'  # Windows版の Depot ID（明示指定）
-    depot1Path: './windows'
+    depot1Path: 'windows'
     depot2Id: '1234569'  # Mac版の Depot ID（明示指定）
-    depot2Path: './mac'
+    depot2Path: 'mac'
     depot3Id: '1234570'  # Linux版の Depot ID（明示指定）
-    depot3Path: './linux'
+    depot3Path: 'linux'
 ```
 
 **注意**: 
@@ -122,6 +122,7 @@ jobs:
 
 **注意**: 
 - Depot Path を指定すると、その Depot が VDF に追加されます
+- Depot Path は ContentRoot からの相対パスで指定（`./` は不要）
 - Depot ID を省略した場合、`App ID + 番号` で自動生成されます
 
 ## セットアップ
@@ -176,6 +177,19 @@ chmod +x ~/steamcmd/steamcmd.sh
 config.vdf が正しく Base64 エンコードされていることを確認：
 ```bash
 echo $STEAM_CONFIG_VDF | base64 -d
+```
+
+### macOS .app バンドルの問題
+
+macOS の `.app` バンドルを含む depot が空として認識される場合：
+
+1. depot ディレクトリに通常のファイルを追加（例: README.txt）
+2. SteamCMD は `.app` ディレクトリを特殊扱いするため、通常のファイルがないと空と判断される
+
+```yaml
+- name: Add placeholder for macOS depot
+  run: |
+    echo "Game files" > builds/macos/README.txt
 ```
 
 ## ライセンス
