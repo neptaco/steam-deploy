@@ -108,6 +108,7 @@ prepare_vdf_file() {
     "setlive" ""
     "preview" "0"
     "local" ""
+    "log" "1"
     
     "depots"
     {
@@ -168,7 +169,24 @@ EOF
         # depot ディレクトリの確認
         for dep_path in macos windows linux; do
             if [ -d "${content_root}/${dep_path}" ]; then
-                echo "Depot ${dep_path} exists with $(find "${content_root}/${dep_path}" -type f | wc -l) files" >&2
+                local file_count=$(find "${content_root}/${dep_path}" -type f | wc -l | tr -d ' ')
+                echo "Depot ${dep_path} exists with ${file_count} files" >&2
+                
+                # macOS の .app バンドルの特別な処理
+                if [ "${dep_path}" = "macos" ]; then
+                    echo "macOS directory structure:" >&2
+                    ls -la "${content_root}/${dep_path}/" | head -10 >&2
+                    
+                    # .app ディレクトリがある場合の確認
+                    if compgen -G "${content_root}/${dep_path}/*.app" > /dev/null; then
+                        echo "Found .app bundle(s) in macOS directory" >&2
+                        for app in "${content_root}/${dep_path}"/*.app; do
+                            if [ -d "$app" ]; then
+                                echo "  - $(basename "$app"): $(find "$app" -type f | wc -l | tr -d ' ') files inside" >&2
+                            fi
+                        done
+                    fi
+                fi
             fi
         done
     fi
