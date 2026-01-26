@@ -108,10 +108,46 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Setup and Deploy
+    # Linux/macOS
+    - name: Setup and Deploy (Linux/macOS)
+      if: runner.os != 'Windows'
       shell: bash
       run: |
         ${{ github.action_path }}/scripts/deploy.sh
+      env:
+        STEAM_USERNAME: ${{ inputs.username }}
+        STEAM_CONFIG_VDF: ${{ inputs.configVdf }}
+        STEAM_APP_ID: ${{ inputs.appId }}
+        BUILD_DESCRIPTION: ${{ inputs.buildDescription }}
+        ROOT_PATH: ${{ inputs.rootPath }}
+        VDF_PATH: ${{ inputs.vdfPath }}
+        DEPOT1_ID: ${{ inputs.depot1Id }}
+        DEPOT1_PATH: ${{ inputs.depot1Path }}
+        DEPOT2_ID: ${{ inputs.depot2Id }}
+        DEPOT2_PATH: ${{ inputs.depot2Path }}
+        DEPOT3_ID: ${{ inputs.depot3Id }}
+        DEPOT3_PATH: ${{ inputs.depot3Path }}
+        DEPOT4_ID: ${{ inputs.depot4Id }}
+        DEPOT4_PATH: ${{ inputs.depot4Path }}
+        DEPOT5_ID: ${{ inputs.depot5Id }}
+        DEPOT5_PATH: ${{ inputs.depot5Path }}
+        DEPOT6_ID: ${{ inputs.depot6Id }}
+        DEPOT6_PATH: ${{ inputs.depot6Path }}
+        DEPOT7_ID: ${{ inputs.depot7Id }}
+        DEPOT7_PATH: ${{ inputs.depot7Path }}
+        DEPOT8_ID: ${{ inputs.depot8Id }}
+        DEPOT8_PATH: ${{ inputs.depot8Path }}
+        DEPOT9_ID: ${{ inputs.depot9Id }}
+        DEPOT9_PATH: ${{ inputs.depot9Path }}
+        RELEASE_BRANCH: ${{ inputs.releaseBranch }}
+        DEBUG_BRANCH: ${{ inputs.debugBranch }}
+
+    # Windows
+    - name: Setup and Deploy (Windows)
+      if: runner.os == 'Windows'
+      shell: pwsh
+      run: |
+        & "${{ github.action_path }}/scripts/deploy.ps1"
       env:
         STEAM_USERNAME: ${{ inputs.username }}
         STEAM_CONFIG_VDF: ${{ inputs.configVdf }}
