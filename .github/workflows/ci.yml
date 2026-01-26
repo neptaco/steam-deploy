@@ -1,0 +1,92 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  lint-bash:
+    name: Lint Bash scripts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check bash syntax
+        run: bash -n scripts/deploy.sh
+
+      - name: ShellCheck
+        uses: ludeeus/action-shellcheck@master
+        with:
+          scandir: './scripts'
+          ignore_paths: '*.ps1'
+
+  lint-powershell:
+    name: Lint PowerShell scripts
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check PowerShell syntax
+        shell: pwsh
+        run: |
+          $null = [System.Management.Automation.Language.Parser]::ParseFile(
+            "$PWD/scripts/deploy.ps1",
+            [ref]$null,
+            [ref]$errors
+          )
+          if ($errors.Count -gt 0) {
+            $errors | ForEach-Object { Write-Error $_ }
+            exit 1
+          }
+          Write-Host "PowerShell syntax OK"
+
+  test-action:
+    name: Test action loading (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, macos-15-intel, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate action.yml
+        run: |
+          if [ -f action.yml ]; then
+            echo "action.yml exists"
+            head -20 action.yml
+          else
+            echo "action.yml not found"
+            exit 1
+          fi
+        shell: bash
+
+  test-dry-run:
+    name: Test dry run (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, macos-15-intel, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create test content
+        run: |
+          mkdir -p test_content/windows
+          mkdir -p test_content/macos
+          echo "test file" > test_content/windows/game.exe
+          echo "test file" > test_content/macos/game.app
+        shell: bash
+
+      - name: Run action in dry run mode
+        uses: ./
+        with:
+          username: 'test_user'
+          configVdf: 'dGVzdA=='
+          appId: '123456'
+          buildDescription: 'CI Test Build'
+          rootPath: 'test_content'
+          depot1Path: 'windows'
+          depot2Path: 'macos'
+          dryRun: 'true'

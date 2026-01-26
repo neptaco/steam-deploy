@@ -291,47 +291,68 @@ cleanup() {
 
 validate_environment() {
     echo "::group::Validating environment"
-    
+
+    if [ "${DRY_RUN}" = "true" ]; then
+        echo "::notice::Dry run mode enabled - skipping credential validation"
+        if [ -z "${STEAM_APP_ID}" ]; then
+            echo "::error::STEAM_APP_ID is required even in dry run mode"
+            exit 1
+        fi
+        echo "Environment validation passed (dry run)"
+        echo "::endgroup::"
+        return
+    fi
+
     if [ -z "${STEAM_USERNAME}" ]; then
         echo "::error::STEAM_USERNAME is required"
         exit 1
     fi
-    
+
     if [ -z "${STEAM_CONFIG_VDF}" ]; then
         echo "::error::STEAM_CONFIG_VDF is required"
         exit 1
     fi
-    
+
     if [ -z "${STEAM_APP_ID}" ]; then
         echo "::error::STEAM_APP_ID is required"
         exit 1
     fi
-    
+
     echo "Environment validation passed"
     echo "::endgroup::"
 }
 
 main() {
     validate_environment
-    
+
     OS_TYPE=$(detect_os)
     echo "Detected OS: ${OS_TYPE}"
-    
+
     install_dependencies "${OS_TYPE}"
-    
+
     download_steamcmd "${OS_TYPE}"
-    
-    setup_config_vdf
-    
-    test_steam_login
-    
+
+    if [ "${DRY_RUN}" = "true" ]; then
+        echo "::notice::Dry run mode - skipping config.vdf setup"
+    else
+        setup_config_vdf
+    fi
+
     VDF_FILE=$(prepare_vdf_file)
-    
-    run_steamcmd_deployment "${VDF_FILE}"
-    
+
+    if [ "${DRY_RUN}" = "true" ]; then
+        echo "::notice::Dry run mode - skipping Steam login and deployment"
+        echo "::group::Generated VDF file"
+        cat "${VDF_FILE}"
+        echo "::endgroup::"
+        echo "::notice::Dry run completed successfully!"
+    else
+        test_steam_login
+        run_steamcmd_deployment "${VDF_FILE}"
+        echo "::notice::Steam deployment completed successfully!"
+    fi
+
     cleanup
-    
-    echo "::notice::Steam deployment completed successfully!"
 }
 
 # エラー時もクリーンアップを確実に実行

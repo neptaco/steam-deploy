@@ -18,6 +18,17 @@ Write-Host "SteamCMD will be installed to: $STEAMCMD_DIR"
 function Validate-Environment {
     Write-Host "::group::Validating environment"
 
+    if ($env:DRY_RUN -eq "true") {
+        Write-Host "::notice::Dry run mode enabled - skipping credential validation"
+        if (-not $env:STEAM_APP_ID) {
+            Write-Host "::error::STEAM_APP_ID is required even in dry run mode"
+            exit 1
+        }
+        Write-Host "Environment validation passed (dry run)"
+        Write-Host "::endgroup::"
+        return
+    }
+
     if (-not $env:STEAM_USERNAME) {
         Write-Host "::error::STEAM_USERNAME is required"
         exit 1
@@ -297,11 +308,26 @@ function Main {
     try {
         Validate-Environment
         Download-SteamCMD
-        Setup-ConfigVdf
-        Test-SteamLogin
+
+        if ($env:DRY_RUN -eq "true") {
+            Write-Host "::notice::Dry run mode - skipping config.vdf setup"
+        } else {
+            Setup-ConfigVdf
+        }
+
         $vdfFile = Prepare-VdfFile
-        Run-SteamCMDDeployment -VdfFile $vdfFile
-        Write-Host "::notice::Steam deployment completed successfully!"
+
+        if ($env:DRY_RUN -eq "true") {
+            Write-Host "::notice::Dry run mode - skipping Steam login and deployment"
+            Write-Host "::group::Generated VDF file"
+            Get-Content $vdfFile
+            Write-Host "::endgroup::"
+            Write-Host "::notice::Dry run completed successfully!"
+        } else {
+            Test-SteamLogin
+            Run-SteamCMDDeployment -VdfFile $vdfFile
+            Write-Host "::notice::Steam deployment completed successfully!"
+        }
     } finally {
         Invoke-Cleanup
     }
