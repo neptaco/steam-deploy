@@ -48,10 +48,10 @@ download_steamcmd() {
         
         if [ "${os_type}" = "linux" ]; then
             echo "Downloading SteamCMD for Linux..."
-            curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf -
+            curl -sqL --retry 3 --retry-delay 5 "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf -
         elif [ "${os_type}" = "macos" ]; then
             echo "Downloading SteamCMD for macOS..."
-            curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_osx.tar.gz" | tar zxvf -
+            curl -sqL --retry 3 --retry-delay 5 "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_osx.tar.gz" | tar zxvf -
         fi
         
         chmod +x "${STEAMCMD_BIN}"
