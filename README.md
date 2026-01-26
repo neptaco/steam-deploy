@@ -1,19 +1,20 @@
 # Steam Deploy Action (Docker-free)
 
-Docker を使用せずに SteamCMD で Steam にデプロイする GitHub Action です。
-macOS、Linux のセルフホストランナーおよび GitHub ホストランナーで動作します。
+A GitHub Action that deploys to Steam using SteamCMD without Docker.
+Works on Windows, macOS, Linux self-hosted runners, and GitHub-hosted runners.
 
-## 特徴
+## Features
 
-- 🐳 Docker 不要 - セルフホストランナーでも動作
-- 🍎 macOS 対応
-- 🐧 Linux 対応
-- 📦 SteamCMD を毎回自動ダウンロード
-- 🔧 複数の depot に対応（最大9つ）
+- 🐳 No Docker required - works on self-hosted runners
+- 🍎 macOS support
+- 🐧 Linux support
+- 🪟 Windows support
+- 📦 Multiple depot support (up to 9)
+- 🔧 Auto-downloads SteamCMD each run
 
-## 使用方法
+## Usage
 
-### 基本的な使用例
+### Basic Example
 
 ```yaml
 name: Deploy to Steam
@@ -24,14 +25,14 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    # または macOS: runs-on: macos-latest
-    # またはセルフホスト: runs-on: self-hosted
-    
+    # or macOS: runs-on: macos-latest
+    # or self-hosted: runs-on: self-hosted
+
     steps:
-      - uses: actions/checkout@v3
-      
+      - uses: actions/checkout@v4
+
       - name: Deploy to Steam
-        uses: your-username/steam-deploy@v1
+        uses: neptaco/steam-deploy@v1
         with:
           username: ${{ secrets.STEAM_USERNAME }}
           configVdf: ${{ secrets.STEAM_CONFIG_VDF }}
@@ -40,51 +41,51 @@ jobs:
           rootPath: 'build'
 ```
 
-### 複数 depot の例（ID自動生成）
+### Multiple Depots Example (Auto-generated IDs)
 
 ```yaml
 - name: Deploy to Steam with multiple depots (auto ID)
-  uses: your-username/steam-deploy@v1
+  uses: neptaco/steam-deploy@v1
   with:
     username: ${{ secrets.STEAM_USERNAME }}
     configVdf: ${{ secrets.STEAM_CONFIG_VDF }}
     appId: '1234567'
     buildDescription: 'Multi-depot build'
     rootPath: '.'
-    depot1Path: 'windows'  # 自動で ID: 1234568
-    depot2Path: 'mac'      # 自動で ID: 1234569
-    depot3Path: 'linux'    # 自動で ID: 1234570
-    releaseBranch: 'prerelease'  # プレリリースブランチにデプロイ
+    depot1Path: 'windows'  # Auto ID: 1234568
+    depot2Path: 'mac'      # Auto ID: 1234569
+    depot3Path: 'linux'    # Auto ID: 1234570
+    releaseBranch: 'prerelease'  # Deploy to prerelease branch
 ```
 
-### 複数 depot の例（ID明示指定）
+### Multiple Depots Example (Explicit IDs)
 
 ```yaml
 - name: Deploy to Steam with multiple depots (explicit ID)
-  uses: your-username/steam-deploy@v1
+  uses: neptaco/steam-deploy@v1
   with:
     username: ${{ secrets.STEAM_USERNAME }}
     configVdf: ${{ secrets.STEAM_CONFIG_VDF }}
     appId: '1234567'
     buildDescription: 'Multi-depot build'
     rootPath: '.'
-    depot1Id: '1234568'  # Windows版の Depot ID（明示指定）
+    depot1Id: '1234568'  # Windows Depot ID (explicit)
     depot1Path: 'windows'
-    depot2Id: '1234569'  # Mac版の Depot ID（明示指定）
+    depot2Id: '1234569'  # Mac Depot ID (explicit)
     depot2Path: 'mac'
-    depot3Id: '1234570'  # Linux版の Depot ID（明示指定）
+    depot3Id: '1234570'  # Linux Depot ID (explicit)
     depot3Path: 'linux'
 ```
 
-**注意**: 
-- Depot ID を省略した場合、`App ID + 番号` で自動生成されます（例: App ID 1234567 → 1234568, 1234569, ...）
-- Depot ID は Steamworks Partner サイトで事前に設定されている必要があります
+**Note**:
+- When Depot Path is specified and Depot ID is omitted, ID is auto-generated as `App ID + number` (e.g., App ID 1234567 → 1234568, 1234569, ...)
+- Depot IDs must be pre-configured in the Steamworks Partner site
 
-### カスタム VDF ファイルの使用
+### Custom VDF File
 
 ```yaml
 - name: Deploy with custom VDF
-  uses: your-username/steam-deploy@v1
+  uses: neptaco/steam-deploy@v1
   with:
     username: ${{ secrets.STEAM_USERNAME }}
     configVdf: ${{ secrets.STEAM_CONFIG_VDF }}
@@ -92,81 +93,86 @@ jobs:
     vdfPath: './custom_app_build.vdf'
 ```
 
-## 入力パラメータ
+## Input Parameters
 
-| パラメータ | 必須 | 説明 |
-|-----------|------|------|
-| `username` | ✅ | Steam のユーザー名 |
-| `configVdf` | ✅ | Steam config.vdf ファイルの内容（Base64エンコード） |
-| `appId` | ✅ | Steam App ID |
-| `buildDescription` | ❌ | ビルドの説明文 |
-| `rootPath` | ❌ | ビルドファイルのルートパス（デフォルト: `.`） |
-| `vdfPath` | ❌ | カスタム VDF ファイルへのパス |
-| `releaseBranch` | ❌ | デプロイ先のブランチ（例: prerelease, beta, default） |
-| `debugBranch` | ❌ | `true` に設定するとデバッグファイルを含める（デフォルト: `false`） |
-| `depot1Id` | ❌ | Depot 1 の ID（省略時は App ID + 1） |
-| `depot1Path` | ❌ | Depot 1 のパス |
-| `depot2Id` | ❌ | Depot 2 の ID（省略時は App ID + 2） |
-| `depot2Path` | ❌ | Depot 2 のパス |
-| `depot3Id` | ❌ | Depot 3 の ID（省略時は App ID + 3） |
-| `depot3Path` | ❌ | Depot 3 のパス |
-| `depot4Id` | ❌ | Depot 4 の ID（省略時は App ID + 4） |
-| `depot4Path` | ❌ | Depot 4 のパス |
-| `depot5Id` | ❌ | Depot 5 の ID（省略時は App ID + 5） |
-| `depot5Path` | ❌ | Depot 5 のパス |
-| `depot6Id` | ❌ | Depot 6 の ID（省略時は App ID + 6） |
-| `depot6Path` | ❌ | Depot 6 のパス |
-| `depot7Id` | ❌ | Depot 7 の ID（省略時は App ID + 7） |
-| `depot7Path` | ❌ | Depot 7 のパス |
-| `depot8Id` | ❌ | Depot 8 の ID（省略時は App ID + 8） |
-| `depot8Path` | ❌ | Depot 8 のパス |
-| `depot9Id` | ❌ | Depot 9 の ID（省略時は App ID + 9） |
-| `depot9Path` | ❌ | Depot 9 のパス |
+| Parameter | Required | Description |
+|-----------|----------|-------------|
+| `username` | Yes | Steam username |
+| `configVdf` | Yes | Steam config.vdf file contents (Base64 encoded) |
+| `appId` | Yes | Steam App ID |
+| `buildDescription` | Optional | Build description |
+| `rootPath` | Optional | Root path for build files (default: `.`) |
+| `vdfPath` | Optional | Path to custom VDF file |
+| `releaseBranch` | Optional | Target branch for deployment (e.g., prerelease, beta, default) |
+| `debugBranch` | Optional | Set to `true` to include debug files (default: `false`) |
+| `depot1Id` | Optional | Depot 1 ID (auto: App ID + 1) |
+| `depot1Path` | Optional | Depot 1 path |
+| `depot2Id` | Optional | Depot 2 ID (auto: App ID + 2) |
+| `depot2Path` | Optional | Depot 2 path |
+| `depot3Id` | Optional | Depot 3 ID (auto: App ID + 3) |
+| `depot3Path` | Optional | Depot 3 path |
+| `depot4Id` | Optional | Depot 4 ID (auto: App ID + 4) |
+| `depot4Path` | Optional | Depot 4 path |
+| `depot5Id` | Optional | Depot 5 ID (auto: App ID + 5) |
+| `depot5Path` | Optional | Depot 5 path |
+| `depot6Id` | Optional | Depot 6 ID (auto: App ID + 6) |
+| `depot6Path` | Optional | Depot 6 path |
+| `depot7Id` | Optional | Depot 7 ID (auto: App ID + 7) |
+| `depot7Path` | Optional | Depot 7 path |
+| `depot8Id` | Optional | Depot 8 ID (auto: App ID + 8) |
+| `depot8Path` | Optional | Depot 8 path |
+| `depot9Id` | Optional | Depot 9 ID (auto: App ID + 9) |
+| `depot9Path` | Optional | Depot 9 path |
 
-**注意**: 
-- Depot Path を指定すると、その Depot が VDF に追加されます
-- Depot Path は ContentRoot からの相対パスで指定（`./` は不要）
-- Depot ID を省略した場合、`App ID + 番号` で自動生成されます
+**Note**:
+- Specifying a Depot Path adds that depot to the VDF
+- Depot Path is relative to ContentRoot (no `./` prefix needed)
+- When Depot Path is specified and Depot ID is omitted, ID is auto-generated as `App ID + number`
 
-## セットアップ
+## Setup
 
-### 1. Steam Guard の設定
+### 1. Steam Guard Configuration
 
-Steam Guard を無効化するか、config.vdf ファイルを使用して認証をバイパスする必要があります。
+You need to disable Steam Guard or use a config.vdf file to bypass authentication.
 
-### 2. config.vdf の取得
+### 2. Getting config.vdf
 
-1. ローカルマシンで SteamCMD にログイン
-2. `~/.steam/steamcmd/config/config.vdf` ファイルをコピー
-3. Base64 エンコード: `base64 -i config.vdf | pbcopy` (macOS) または `base64 config.vdf | xclip -selection clipboard` (Linux)
-4. GitHub Secrets に `STEAM_CONFIG_VDF` として保存
+1. Log in to SteamCMD on your local machine
+2. Copy the config.vdf file:
+   - **Windows**: `C:\Users\<username>\AppData\Local\Steam\steamcmd\config\config.vdf`
+   - **macOS**: `~/Library/Application Support/Steam/steamcmd/config/config.vdf`
+   - **Linux**: `~/.steam/steamcmd/config/config.vdf`
+3. Base64 encode:
+   - **Windows (PowerShell)**: `[Convert]::ToBase64String([IO.File]::ReadAllBytes("config.vdf")) | Set-Clipboard`
+   - **macOS**: `base64 -i config.vdf | pbcopy`
+   - **Linux**: `base64 config.vdf | xclip -selection clipboard`
+4. Save as `STEAM_CONFIG_VDF` in GitHub Secrets
 
-### 3. GitHub Secrets の設定
+### 3. GitHub Secrets Configuration
 
-リポジトリの Settings > Secrets and variables > Actions で以下を設定：
+Set the following in your repository's Settings > Secrets and variables > Actions:
 
-- `STEAM_USERNAME`: Steam のユーザー名
-- `STEAM_CONFIG_VDF`: Base64 エンコードされた config.vdf
+- `STEAM_USERNAME`: Steam username
+- `STEAM_CONFIG_VDF`: Base64-encoded config.vdf
 
-## ファイル除外
+## File Exclusions
 
-デフォルトでは、以下のファイルが自動的に除外されます：
-- `*.DS_Store` (常に除外)
-- `*.pdb` (debugBranch が false の場合)
-- `**/*_BurstDebugInformation_DoNotShip*` (debugBranch が false の場合)
-- `**/*_BackUpThisFolder_ButDontShipItWithYourGame*` (debugBranch が false の場合)
+By default, the following files are automatically excluded:
+- `*.DS_Store` (always excluded)
+- `*.pdb` (when debugBranch is false)
+- `**/*_BurstDebugInformation_DoNotShip*` (when debugBranch is false)
+- `**/*_BackUpThisFolder_ButDontShipItWithYourGame*` (when debugBranch is false)
 
-デバッグビルドをデプロイする場合は、`debugBranch: 'true'` を設定してください。
+Set `debugBranch: 'true'` to deploy debug builds.
 
-## 動作環境
+## Supported Environments
 
-- ✅ GitHub ホストランナー (ubuntu-latest, macos-latest)
-- ✅ セルフホストランナー (Linux, macOS)
-- ❌ Windows（未対応）
+- ✅ GitHub-hosted runners (ubuntu-latest, macos-latest, windows-latest)
+- ✅ Self-hosted runners (Linux, macOS, Windows)
 
-## トラブルシューティング
+## Troubleshooting
 
-### Linux での依存関係エラー
+### Linux Dependency Errors
 
 Ubuntu/Debian:
 ```bash
@@ -179,29 +185,39 @@ CentOS/RHEL:
 sudo yum install glibc.i686 libstdc++.i686
 ```
 
-### macOS での権限エラー
+### macOS Permission Errors
 
 ```bash
 chmod +x ~/steamcmd/steamcmd.sh
 ```
 
-### config.vdf エラー
+### Windows Execution Policy Errors
 
-config.vdf が正しく Base64 エンコードされていることを確認：
-```bash
-echo $STEAM_CONFIG_VDF | base64 -d
+If you encounter execution policy errors on Windows self-hosted runners:
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
+### config.vdf Errors
 
-## ライセンス
+Verify config.vdf is correctly Base64 encoded:
+```bash
+# Linux/macOS
+echo $STEAM_CONFIG_VDF | base64 -d
+
+# Windows (PowerShell)
+[System.Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($env:STEAM_CONFIG_VDF))
+```
+
+## License
 
 MIT
 
-## 貢献
+## Contributing
 
-Issue や Pull Request は歓迎します！
+Issues and Pull Requests are welcome!
 
-## 参考
+## References
 
 - [SteamCMD Documentation](https://developer.valvesoftware.com/wiki/SteamCMD)
 - [Steam Partner Documentation](https://partner.steamgames.com/)
