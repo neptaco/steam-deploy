@@ -108,7 +108,14 @@ prepare_vdf_file() {
     "setlive" "${RELEASE_BRANCH}"
     "preview" "0"
     "local" ""
-    
+
+EOF
+
+        if [ -n "${INSTALL_SCRIPT_PATH}" ]; then
+            echo "    \"installscript\" \"${INSTALL_SCRIPT_PATH}\"" >> "${vdf_file}"
+        fi
+
+        cat >> "${vdf_file}" << EOF
     "depots"
     {
 EOF
