@@ -24,6 +24,10 @@ inputs:
     description: 'The path to the VDF file'
     required: false
     default: ''
+  installScriptPath:
+    description: 'The path to the installscript.vdf file (relative to ContentRoot)'
+    required: false
+    default: ''
   depot1Id:
     description: 'The Depot ID for depot 1'
     required: false
@@ -125,6 +129,7 @@ runs:
         BUILD_DESCRIPTION: ${{ inputs.buildDescription }}
         ROOT_PATH: ${{ inputs.rootPath }}
         VDF_PATH: ${{ inputs.vdfPath }}
+        INSTALL_SCRIPT_PATH: ${{ inputs.installScriptPath }}
         DEPOT1_ID: ${{ inputs.depot1Id }}
         DEPOT1_PATH: ${{ inputs.depot1Path }}
         DEPOT2_ID: ${{ inputs.depot2Id }}
@@ -160,6 +165,7 @@ runs:
         BUILD_DESCRIPTION: ${{ inputs.buildDescription }}
         ROOT_PATH: ${{ inputs.rootPath }}
         VDF_PATH: ${{ inputs.vdfPath }}
+        INSTALL_SCRIPT_PATH: ${{ inputs.installScriptPath }}
         DEPOT1_ID: ${{ inputs.depot1Id }}
         DEPOT1_PATH: ${{ inputs.depot1Path }}
         DEPOT2_ID: ${{ inputs.depot2Id }}

@@ -147,7 +147,7 @@ function Prepare-VdfFile {
         Write-Host "Creating VDF file at $vdfFile"
         Write-Host "Content root: $contentRoot"
 
-        $vdfContent = @"
+    $vdfContent = @"
 "appbuild"
 {
     "appid" "$env:STEAM_APP_ID"
@@ -157,6 +157,7 @@ function Prepare-VdfFile {
     "setlive" "$env:RELEASE_BRANCH"
     "preview" "0"
     "local" ""
+    $(if ($env:INSTALL_SCRIPT_PATH) { "`"installscript`" `"$($env:INSTALL_SCRIPT_PATH)`"" })
 
     "depots"
     {
