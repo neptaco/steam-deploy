@@ -103,7 +103,7 @@ jobs:
 | `buildDescription` | Optional | Build description |
 | `rootPath` | Optional | Root path for build files (default: `.`) |
 | `vdfPath` | Optional | Path to custom VDF file |
-| `installScriptPath` | Optional | Path to installscript.vdf (relative to ContentRoot, used when auto-generating VDF) |
+| `installScriptPath` | Optional | installscript filename (e.g. `installscript.vdf`). Must exist in all depot directories |
 | `releaseBranch` | Optional | Target branch for deployment (e.g., prerelease, beta, default) |
 | `debugBranch` | Optional | Set to `true` to include debug files (default: `false`) |
 | `depot1Id` | Optional | Depot 1 ID (auto: App ID + 1) |

@@ -157,7 +157,27 @@ function Prepare-VdfFile {
     "setlive" "$env:RELEASE_BRANCH"
     "preview" "0"
     "local" ""
-    $(if ($env:INSTALL_SCRIPT_PATH) { "`"installscript`" `"$($env:INSTALL_SCRIPT_PATH)`"" })
+    $(if ($env:INSTALL_SCRIPT_PATH) {
+        # すべての設定済み depot に installscript が存在するかチェック
+        $missingDepots = @()
+        for ($j = 1; $j -le 9; $j++) {
+            $dp = [Environment]::GetEnvironmentVariable("DEPOT${j}_PATH")
+            if ($dp) {
+                $expectedPath = Join-Path $contentRoot (Join-Path $dp $env:INSTALL_SCRIPT_PATH)
+                if (-not (Test-Path $expectedPath)) {
+                    $missingDepots += "depot${j}($dp)"
+                }
+            }
+        }
+
+        if ($missingDepots.Count -gt 0) {
+            Write-Host "::error::installscript '$($env:INSTALL_SCRIPT_PATH)' not found in: $($missingDepots -join ' ')"
+            Write-Host "::error::Place '$($env:INSTALL_SCRIPT_PATH)' in each depot directory"
+            exit 1
+        }
+
+        "`"installscript`" `"$($env:INSTALL_SCRIPT_PATH)`""
+    })
 
     "depots"
     {

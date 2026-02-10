@@ -112,6 +112,25 @@ prepare_vdf_file() {
 EOF
 
         if [ -n "${INSTALL_SCRIPT_PATH}" ]; then
+            # すべての設定済み depot に installscript が存在するかチェック
+            local missing_depots=""
+            for i in 1 2 3 4 5 6 7 8 9; do
+                local dp_var="DEPOT${i}_PATH"
+                local dp="${!dp_var}"
+                if [ -n "${dp}" ]; then
+                    local expected_path="${content_root}/${dp}/${INSTALL_SCRIPT_PATH}"
+                    if [ ! -f "${expected_path}" ]; then
+                        missing_depots="${missing_depots} depot${i}(${dp})"
+                    fi
+                fi
+            done
+
+            if [ -n "${missing_depots}" ]; then
+                echo "::error::installscript '${INSTALL_SCRIPT_PATH}' not found in:${missing_depots}" >&2
+                echo "::error::Place '${INSTALL_SCRIPT_PATH}' in each depot directory" >&2
+                exit 1
+            fi
+
             echo "    \"installscript\" \"${INSTALL_SCRIPT_PATH}\"" >> "${vdf_file}"
         fi
 
