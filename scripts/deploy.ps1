@@ -255,6 +255,33 @@ function Prepare-VdfFile {
     return $vdfFile
 }
 
+function Clean-BuildArtifacts {
+    Write-Host "::group::Cleaning build artifacts"
+
+    $contentRoot = if ($env:ROOT_PATH) { $env:ROOT_PATH } else { "." }
+    if (-not [System.IO.Path]::IsPathRooted($contentRoot)) {
+        if ($env:GITHUB_WORKSPACE) {
+            $contentRoot = Join-Path $env:GITHUB_WORKSPACE $contentRoot
+        } else {
+            $contentRoot = Join-Path (Get-Location) $contentRoot
+        }
+    }
+    $contentRoot = (Resolve-Path $contentRoot).Path
+
+    for ($i = 1; $i -le 9; $i++) {
+        $depotPath = [Environment]::GetEnvironmentVariable("DEPOT${i}_PATH")
+        if ($depotPath) {
+            $target = Join-Path $contentRoot (Join-Path $depotPath "steam_appid.txt")
+            if (Test-Path $target) {
+                Write-Host "Removing $target"
+                Remove-Item $target -Force
+            }
+        }
+    }
+
+    Write-Host "::endgroup::"
+}
+
 function Run-SteamCMDDeployment {
     param([string]$VdfFile)
 
@@ -339,6 +366,8 @@ function Main {
         }
 
         $vdfFile = Prepare-VdfFile
+
+        Clean-BuildArtifacts
 
         if ($env:DRY_RUN -eq "true") {
             Write-Host "::notice::Dry run mode - skipping Steam login and deployment"

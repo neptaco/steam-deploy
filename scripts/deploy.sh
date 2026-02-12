@@ -207,6 +207,33 @@ EOF
     echo "${vdf_file}"
 }
 
+clean_build_artifacts() {
+    echo "::group::Cleaning build artifacts"
+
+    local content_root="${ROOT_PATH:-.}"
+    if [[ "${content_root}" != /* ]]; then
+        if [ -n "${GITHUB_WORKSPACE}" ]; then
+            content_root="${GITHUB_WORKSPACE}/${content_root}"
+        else
+            content_root="$(cd "${content_root}" 2>/dev/null && pwd)" || content_root="$(pwd)/${content_root}"
+        fi
+    fi
+
+    for i in 1 2 3 4 5 6 7 8 9; do
+        local depot_path_var="DEPOT${i}_PATH"
+        local depot_path="${!depot_path_var}"
+        if [ -n "${depot_path}" ]; then
+            local target="${content_root}/${depot_path}/steam_appid.txt"
+            if [ -f "${target}" ]; then
+                echo "Removing ${target}"
+                rm -f "${target}"
+            fi
+        fi
+    done
+
+    echo "::endgroup::"
+}
+
 install_dependencies() {
     local os_type="$1"
     
@@ -367,6 +394,8 @@ main() {
     fi
 
     VDF_FILE=$(prepare_vdf_file)
+
+    clean_build_artifacts
 
     if [ "${DRY_RUN}" = "true" ]; then
         echo "::notice::Dry run mode - skipping Steam login and deployment"
