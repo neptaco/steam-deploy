@@ -215,6 +215,7 @@ function Prepare-VdfFile {
             "FileExclusion" "*.pdb"
             "FileExclusion" "**/*_BurstDebugInformation_DoNotShip*"
             "FileExclusion" "**/*_BackUpThisFolder_ButDontShipItWithYourGame*"
+            "FileExclusion" "steam_appid.txt"
         }
 "@
                 } else {
@@ -230,6 +231,7 @@ function Prepare-VdfFile {
                 "recursive" "1"
             }
             "FileExclusion" "*.DS_Store"
+            "FileExclusion" "steam_appid.txt"
         }
 "@
                 }

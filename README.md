@@ -160,6 +160,7 @@ Set the following in your repository's Settings > Secrets and variables > Action
 
 By default, the following files are automatically excluded:
 - `*.DS_Store` (always excluded)
+- `steam_appid.txt` (always excluded)
 - `*.pdb` (when debugBranch is false)
 - `**/*_BurstDebugInformation_DoNotShip*` (when debugBranch is false)
 - `**/*_BackUpThisFolder_ButDontShipItWithYourGame*` (when debugBranch is false)

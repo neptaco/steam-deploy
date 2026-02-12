@@ -172,6 +172,7 @@ EOF
             "FileExclusion" "*.pdb"
             "FileExclusion" "**/*_BurstDebugInformation_DoNotShip*"
             "FileExclusion" "**/*_BackUpThisFolder_ButDontShipItWithYourGame*"
+            "FileExclusion" "steam_appid.txt"
         }
 EOF
                 else
@@ -186,6 +187,7 @@ EOF
                 "recursive" "1"
             }
             "FileExclusion" "*.DS_Store"
+            "FileExclusion" "steam_appid.txt"
         }
 EOF
                 fi
